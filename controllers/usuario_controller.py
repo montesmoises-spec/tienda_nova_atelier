@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from models.usuario_model import UsuarioModel
+from models.Usuario_Model import UsuarioModel
 
 # Definición del Blueprint para el controlador
 usuario_bp = Blueprint('usuarios', __name__, url_prefix='/usuarios')
