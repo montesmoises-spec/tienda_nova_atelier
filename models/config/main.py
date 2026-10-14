@@ -1,5 +1,5 @@
-from model.models.cliente_model import ClienteModel
-from model.models.producto_model import ProductoModel
+from models.cliente_model import ClienteModel
+from models.producto_model import ProductoModel
 
 # --- PROBAR CREACIÓN (CREATE) ---
 id_nuevo = ClienteModel.crear("Juan Perez", "juan@email.com", "+56 9 1111 2222")
