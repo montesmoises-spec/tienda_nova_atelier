@@ -1,36 +1,36 @@
-from models.producto_model import ProductoModel
+from flask import Blueprint, render_template, request, redirect, url_for
+from models.producto_model import *
 
-class ProductoController:
-    """Controlador para gestionar la lógica de negocio de Productos."""
+producto_bp = Blueprint('producto', __name__)
 
-    @staticmethod
-    def crear_producto(nombre, precio, stock):
-        if not nombre or precio < 0 or stock < 0:
-            return {"exito": False, "mensaje": "Datos inválidos (precio y stock deben ser valores positivos)."}
+@producto_bp.route('/')
+def index():
+    productos = obtener_productos()
+    return render_template('producto/index.html', productos=productos)
 
-        id_creado = ProductoModel.crear(nombre, precio, stock)
-        if id_creado:
-            return {"exito": True, "mensaje": "Producto creado con éxito.", "id_producto": id_creado}
-        return {"exito": False, "mensaje": "Error al registrar el producto."}
+@producto_bp.route('/crear', methods=['GET', 'POST'])
+def crear():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        precio = request.form['precio']
+        stock = request.form['stock']
+        crear_producto(nombre, precio, stock)
+        return redirect(url_for('producto.index'))
+    return render_template('producto/crear.html')
 
-    @staticmethod
-    def listar_productos():
-        productos = ProductoModel.obtener_todos()
-        return {"exito": True, "datos": productos}
+@producto_bp.route('/editar/<int:id_producto>', methods=['GET', 'POST'])
+def editar(id_producto):
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        precio = request.form['precio']
+        stock = request.form['stock']
+        actualizar_producto(id_producto, nombre, precio, stock)
+        return redirect(url_for('producto.index'))
+    
+    producto = obtener_producto_por_id(id_producto)
+    return render_template('producto/editar.html', producto=producto)
 
-    @staticmethod
-    def actualizar_producto(id_producto, nombre, precio, stock):
-        if not id_producto or not nombre or precio < 0 or stock < 0:
-            return {"exito": False, "mensaje": "Datos incompletos o valores numéricos no válidos."}
-
-        actualizado = ProductoModel.actualizar(id_producto, nombre, precio, stock)
-        if actualizado:
-            return {"exito": True, "mensaje": "Producto actualizado correctamente."}
-        return {"exito": False, "mensaje": "No se pudo actualizar el producto."}
-
-    @staticmethod
-    def eliminar_producto(id_producto):
-        eliminado = ProductoModel.eliminar(id_producto)
-        if eliminado:
-            return {"exito": True, "mensaje": "Producto eliminado con éxito."}
-        return {"exito": False, "mensaje": "No se pudo eliminar el producto."}
+@producto_bp.route('/eliminar/<int:id_producto>', methods=['POST'])
+def eliminar(id_producto):
+    eliminar_producto(id_producto)
+    return redirect(url_for('producto.index'))

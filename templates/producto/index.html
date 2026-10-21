@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>Lista de Productos</h2>
+<a href="{{ url_for('producto.crear') }}" class="btn btn-crear">Agregar Nuevo Producto</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in productos %}
+        <tr>
+            <td>{{ producto.id_producto }}</td>
+            <td>{{ producto.nombre }}</td>
+            <td>${{ producto.precio }}</td>
+            <td>{{ producto.stock }}</td>
+            <td>
+                <a href="{{ url_for('producto.editar', id_producto=producto.id_producto) }}" class="btn btn-editar">Editar</a>
+                <form action="{{ url_for('producto.eliminar', id_producto=producto.id_producto) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-eliminar" onclick="return confirm('¿Seguro que deseas eliminar este producto?')">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5">No hay productos registrados.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

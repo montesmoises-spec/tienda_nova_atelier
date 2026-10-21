@@ -6,3 +6,8 @@ venv/
 # Archivos de configuración locales y variables de entorno
 .env
 *.env
+
+# Python bytecode y caché
+__pycache__/
+*.py[cod]
+*$py.class
