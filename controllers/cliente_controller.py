@@ -1,51 +1,43 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-# Conexión directa con la clase Modelo del Integrante M
 from models.cliente_model import ClienteModel
 
-# Definición del Blueprint para la entidad Cliente
-cliente_bp = Blueprint('cliente', __name__, url_prefix='/clientes')
+class ClienteController:
+    """Controlador para gestionar la lógica de negocio de Clientes."""
 
-# 1. RUTA: Listar todos los clientes
-@cliente_bp.route('/')
-def index():
-    # Llama a ClienteModel.obtener_todos()
-    clientes = ClienteModel.obtener_todos()
-    return render_template('cliente/index.html', clientes=clientes)
-
-# 2. RUTA: Crear cliente
-@cliente_bp.route('/crear', methods=['GET', 'POST'])
-def crear():
-    if request.method == 'POST':
-        # Recibe los datos enviados desde el formulario (Vista)
-        nombre = request.form['nombre']
-        email = request.form['email']
-        telefono = request.form['telefono']
+    @staticmethod
+    def crear_cliente(nombre, email, telefono):
+        if not nombre or not email:
+            return {"exito": False, "mensaje": "El nombre y el email son obligatorios."}
         
-        # Envia los datos a ClienteModel.crear(...)
-        ClienteModel.crear(nombre, email, telefono)
-        return redirect(url_for('cliente.index'))
-    
-    return render_template('cliente/crear.html')
+        id_creado = ClienteModel.crear(nombre, email, telefono)
+        if id_creado:
+            return {"exito": True, "mensaje": "Cliente creado correctamente.", "id_cliente": id_creado}
+        return {"exito": False, "mensaje": "Error al intentar registrar el cliente."}
 
-# 3. RUTA: Editar cliente
-@cliente_bp.route('/editar/<int:id_cliente>', methods=['GET', 'POST'])
-def editar(id_cliente):
-    if request.method == 'POST':
-        nombre = request.form['nombre']
-        email = request.form['email']
-        telefono = request.form['telefono']
+    @staticmethod
+    def listar_clientes():
+        clientes = ClienteModel.obtener_todos()
+        return {"exito": True, "datos": clientes}
+
+    @staticmethod
+    def obtener_cliente(id_cliente):
+        cliente = ClienteModel.obtener_por_id(id_cliente)
+        if cliente:
+            return {"exito": True, "datos": cliente}
+        return {"exito": False, "mensaje": f"No se encontró el cliente con ID {id_cliente}."}
+
+    @staticmethod
+    def actualizar_cliente(id_cliente, nombre, email, telefono):
+        if not id_cliente or not nombre or not email:
+            return {"exito": False, "mensaje": "El ID, nombre y email son obligatorios."}
         
-        # Llama a ClienteModel.actualizar(...)
-        ClienteModel.actualizar(id_cliente, nombre, email, telefono)
-        return redirect(url_for('cliente.index'))
-    
-    # Si es GET, busca los datos del cliente por id_cliente
-    cliente = ClienteModel.obtener_por_id(id_cliente)
-    return render_template('cliente/editar.html', cliente=cliente)
+        actualizado = ClienteModel.actualizar(id_cliente, nombre, email, telefono)
+        if actualizado:
+            return {"exito": True, "mensaje": "Cliente actualizado correctamente."}
+        return {"exito": False, "mensaje": "No se pudo actualizar el cliente (verifique si el ID existe)."}
 
-# 4. RUTA: Eliminar cliente
-@cliente_bp.route('/eliminar/<int:id_cliente>')
-def eliminar(id_cliente):
-    # Llama a ClienteModel.eliminar(...)
-    ClienteModel.eliminar(id_cliente)
-    return redirect(url_for('cliente.index'))
+    @staticmethod
+    def eliminar_cliente(id_cliente):
+        eliminado = ClienteModel.eliminar(id_cliente)
+        if eliminado:
+            return {"exito": True, "mensaje": "Cliente eliminado correctamente."}
+        return {"exito": False, "mensaje": "No se pudo eliminar el cliente."}

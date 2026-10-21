@@ -1,43 +1,58 @@
-from flask import Blueprint, render_template, request, redirect, url_for
 from models.detalle_pedido_model import DetallePedidoModel
+from models.pedido_model import PedidoModel
 
-# Definición del Blueprint para Detalle de Pedido
-detalle_pedido_bp = Blueprint('detalle_pedido', __name__, url_prefix='/detalle_pedido')
+class DetallePedidoController:
+    """Controlador para la gestión individual de los ítems de un pedido."""
 
-# 1. RUTA: Listar ítems de un pedido específico
-@detalle_pedido_bp.route('/pedido/<int:id_pedido>')
-def obtener_por_pedido(id_pedido):
-    detalles = DetallePedidoModel.obtener_por_pedido(id_pedido)
-    return render_template('detalle_pedido/index.html', detalles=detalles, id_pedido=id_pedido)
-
-# 2. RUTA: Agregar un ítem al detalle del pedido
-@detalle_pedido_bp.route('/crear/<int:id_pedido>', methods=['GET', 'POST'])
-def crear(id_pedido):
-    if request.method == 'POST':
-        id_producto = request.form['id_producto']
-        cantidad = request.form['cantidad']
-        precio_unitario = request.form['precio_unitario']
+    @staticmethod
+    def agregar_item(id_pedido, id_producto, cantidad, precio_unitario):
+        """Agrega un ítem individual a un pedido existente."""
+        if not id_pedido or not id_producto:
+            return {"exito": False, "mensaje": "El ID de pedido y producto son obligatorios."}
         
-        # Guardar en la base de datos
-        DetallePedidoModel.crear(id_pedido, id_producto, cantidad, precio_unitario)
-        return redirect(url_for('detalle_pedido.obtener_por_pedido', id_pedido=id_pedido))
-    
-    return render_template('detalle_pedido/crear.html', id_pedido=id_pedido)
+        if cantidad <= 0 or precio_unitario < 0:
+            return {"exito": False, "mensaje": "La cantidad debe ser mayor a 0 y el precio no puede ser negativo."}
 
-# 3. RUTA: Actualizar cantidad o precio de un ítem
-@detalle_pedido_bp.route('/editar/<int:id_detalle>/<int:id_pedido>', methods=['GET', 'POST'])
-def editar(id_detalle, id_pedido):
-    if request.method == 'POST':
-        cantidad = request.form['cantidad']
-        precio_unitario = request.form['precio_unitario']
-        
-        DetallePedidoModel.actualizar(id_detalle, cantidad, precio_unitario)
-        return redirect(url_for('detalle_pedido.obtener_por_pedido', id_pedido=id_pedido))
-    
-    return render_template('detalle_pedido/editar.html', id_detalle=id_detalle, id_pedido=id_pedido)
+        # Validar existencia del pedido antes de insertar
+        pedido = PedidoModel.obtener_por_id(id_pedido)
+        if not pedido:
+            return {"exito": False, "mensaje": f"El pedido con ID {id_pedido} no existe."}
 
-# 4. RUTA: Eliminar un ítem del detalle
-@detalle_pedido_bp.route('/eliminar/<int:id_detalle>/<int:id_pedido>')
-def eliminar(id_detalle, id_pedido):
-    DetallePedidoModel.eliminar(id_detalle)
-    return redirect(url_for('detalle_pedido.obtener_por_pedido', id_pedido=id_pedido))
+        id_detalle = DetallePedidoModel.crear(id_pedido, id_producto, cantidad, precio_unitario)
+        if id_detalle:
+            return {"exito": True, "mensaje": "Ítem agregado al pedido con éxito.", "id_detalle": id_detalle}
+        return {"exito": False, "mensaje": "Error al registrar el ítem en el detalle."}
+
+    @staticmethod
+    def listar_por_pedido(id_pedido):
+        """Obtiene la lista de ítems asociados a un pedido específico."""
+        if not id_pedido:
+            return {"exito": False, "mensaje": "Se requiere el ID del pedido."}
+
+        items = DetallePedidoModel.obtener_por_pedido(id_pedido)
+        return {"exito": True, "datos": items}
+
+    @staticmethod
+    def actualizar_item(id_detalle, cantidad, precio_unitario):
+        """Modifica la cantidad o precio de un ítem de detalle existente."""
+        if not id_detalle:
+            return {"exito": False, "mensaje": "El ID del detalle es obligatorio."}
+
+        if cantidad <= 0 or precio_unitario < 0:
+            return {"exito": False, "mensaje": "La cantidad debe ser mayor a 0 y el precio no puede ser negativo."}
+
+        actualizado = DetallePedidoModel.actualizar(id_detalle, cantidad, precio_unitario)
+        if actualizado:
+            return {"exito": True, "mensaje": "Ítem actualizado correctamente."}
+        return {"exito": False, "mensaje": "No se pudo actualizar el ítem (verifique si el ID de detalle existe)."}
+
+    @staticmethod
+    def eliminar_item(id_detalle):
+        """Elimina un ítem específico del detalle del pedido."""
+        if not id_detalle:
+            return {"exito": False, "mensaje": "El ID del detalle es obligatorio."}
+
+        eliminado = DetallePedidoModel.eliminar(id_detalle)
+        if eliminado:
+            return {"exito": True, "mensaje": "Ítem eliminado correctamente del pedido."}
+        return {"exito": False, "mensaje": "No se pudo eliminar el ítem."}
