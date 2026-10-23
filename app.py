@@ -1,18 +1,14 @@
-from flask import Flask, redirect, url_for
-from controllers.usuario_controller import usuario_bp
+from flask import Flask
+from controllers.producto_controller import producto_bp
 
 app = Flask(__name__)
-app.secret_key = 'cambia-esta-clave'  # necesaria para usar flash()
 
-# Registrar el controlador de usuarios
-app.register_blueprint(usuario_bp)
+# Registro del Blueprint/Controlador
+app.register_blueprint(producto_bp, url_prefix='/productos')
 
-
-# La página principal redirige al listado de usuarios
 @app.route('/')
-def inicio():
-    return redirect(url_for('usuarios.index'))
-
+def home():
+    return redirect('/productos')
 
 if __name__ == '__main__':
     app.run(debug=True)

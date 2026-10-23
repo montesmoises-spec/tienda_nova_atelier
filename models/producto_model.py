@@ -1,63 +1,49 @@
-from config.conexion import obtener_conexion
+from config import get_db_connection
 
-class ProductoModel:
-    """Clase dedicada exclusivamente a ejecutar sentencias SQL para la tabla 'producto'."""
+def obtener_productos():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM producto")
+    productos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return productos
 
-    @staticmethod
-    def crear(nombre, precio, stock):
-        """CREATE: Inserta un nuevo producto."""
-        conexion = obtener_conexion()
-        if conexion:
-            cursor = conexion.cursor()
-            sql = "INSERT INTO producto (nombre, precio, stock) VALUES (%s, %s, %s)"
-            cursor.execute(sql, (nombre, precio, stock))
-            conexion.commit()
-            nuevo_id = cursor.lastrowid
-            cursor.close()
-            conexion.close()
-            return nuevo_id
-        return None
+def obtener_producto_por_id(id_producto):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM producto WHERE id_producto = %s", (id_producto,))
+    producto = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return producto
 
-    @staticmethod
-    def obtener_todos():
-        """READ: Obtiene todos los productos."""
-        conexion = obtener_conexion()
-        if conexion:
-            cursor = conexion.cursor(dictionary=True)
-            sql = "SELECT * FROM producto"
-            cursor.execute(sql)
-            resultados = cursor.fetchall()
-            cursor.close()
-            conexion.close()
-            return resultados
-        return []
+def crear_producto(nombre, precio, stock):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO producto (nombre, precio, stock) VALUES (%s, %s, %s)",
+        (nombre, precio, stock)
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-    @staticmethod
-    def actualizar(id_producto, nombre, precio, stock):
-        """UPDATE: Actualiza los datos de un producto."""
-        conexion = obtener_conexion()
-        if conexion:
-            cursor = conexion.cursor()
-            sql = "UPDATE producto SET nombre = %s, precio = %s, stock = %s WHERE id_producto = %s"
-            cursor.execute(sql, (nombre, precio, stock, id_producto))
-            conexion.commit()
-            filas_afectadas = cursor.rowcount
-            cursor.close()
-            conexion.close()
-            return filas_afectadas > 0
-        return False
+def actualizar_producto(id_producto, nombre, precio, stock):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE producto SET nombre = %s, precio = %s, stock = %s WHERE id_producto = %s",
+        (nombre, precio, stock, id_producto)
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-    @staticmethod
-    def eliminar(id_producto):
-        """DELETE: Elimina un producto por su ID."""
-        conexion = obtener_conexion()
-        if conexion:
-            cursor = conexion.cursor()
-            sql = "DELETE FROM producto WHERE id_producto = %s"
-            cursor.execute(sql, (id_producto,))
-            conexion.commit()
-            filas_afectadas = cursor.rowcount
-            cursor.close()
-            conexion.close()
-            return filas_afectadas > 0
-        return False
+def eliminar_producto(id_producto):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM producto WHERE id_producto = %s", (id_producto,))
+    conn.commit()
+    cursor.close()
+    conn.close()
