@@ -1,11 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from models.producto_model import (
-    obtener_productos,
-    obtener_producto_por_id,
-    crear_producto,
-    actualizar_producto,
-    eliminar_producto
-)
+from models.producto_model import *
 
 producto_bp = Blueprint('producto', __name__)
 

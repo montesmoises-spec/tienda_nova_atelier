@@ -1,10 +1,10 @@
 from flask import Flask, redirect, url_for
-from controllers.producto_controller import producto_blueprint
+from controllers.producto_controller import producto_bp
 
 app = Flask(__name__)
 
 # Registrar el Blueprint del controlador de productos
-app.register_blueprint(producto_blueprint, url_prefix='/productos')
+app.register_blueprint(producto_bp, url_prefix='/productos')
 
 @app.route('/')
 def index():
