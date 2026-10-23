@@ -1,14 +1,15 @@
-from flask import Flask
-from controllers.producto_controller import producto_bp
+from flask import Flask, redirect, url_for
+from controllers.producto_controller import producto_blueprint
 
 app = Flask(__name__)
 
-# Registro del Blueprint/Controlador
-app.register_blueprint(producto_bp, url_prefix='/productos')
+# Registrar el Blueprint del controlador de productos
+app.register_blueprint(producto_blueprint, url_prefix='/productos')
 
 @app.route('/')
-def home():
-    return redirect('/productos')
+def index():
+    # Redirige por defecto a la vista principal de productos
+    return redirect(url_for('producto.index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
