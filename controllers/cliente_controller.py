@@ -1,43 +1,36 @@
-from models.cliente_model import ClienteModel
+from flask import Blueprint, render_template, request, redirect, url_for
+from models.cliente_models import *
 
-class ClienteController:
-    """Controlador para gestionar la lógica de negocio de Clientes."""
+cliente_bp = Blueprint('cliente', __name__)
 
-    @staticmethod
-    def crear_cliente(nombre, email, telefono):
-        if not nombre or not email:
-            return {"exito": False, "mensaje": "El nombre y el email son obligatorios."}
-        
-        id_creado = ClienteModel.crear(nombre, email, telefono)
-        if id_creado:
-            return {"exito": True, "mensaje": "Cliente creado correctamente.", "id_cliente": id_creado}
-        return {"exito": False, "mensaje": "Error al intentar registrar el cliente."}
+@cliente_bp.route('/')
+def index():
+    clientes = obtener_clientes()
+    return render_template('cliente/index.html', clientes=clientes)
 
-    @staticmethod
-    def listar_clientes():
-        clientes = ClienteModel.obtener_todos()
-        return {"exito": True, "datos": clientes}
+@cliente_bp.route('/crear', methods=['GET', 'POST'])
+def crear():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        precio = request.form['precio']
+        stock = request.form['stock']
+        crear_producto(nombre, precio, stock)
+        return redirect(url_for('producto.index'))
+    return render_template('producto/crear.html')
 
-    @staticmethod
-    def obtener_cliente(id_cliente):
-        cliente = ClienteModel.obtener_por_id(id_cliente)
-        if cliente:
-            return {"exito": True, "datos": cliente}
-        return {"exito": False, "mensaje": f"No se encontró el cliente con ID {id_cliente}."}
+@cliente_bp.route('/editar/<int:id_producto>', methods=['GET', 'POST'])
+def editar(id_producto):
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        precio = request.form['precio']
+        stock = request.form['stock']
+        actualizar_producto(id_producto, nombre, precio, stock)
+        return redirect(url_for('producto.index'))
+    
+    producto = obtener_producto_por_id(id_producto)
+    return render_template('producto/editar.html', producto=producto)
 
-    @staticmethod
-    def actualizar_cliente(id_cliente, nombre, email, telefono):
-        if not id_cliente or not nombre or not email:
-            return {"exito": False, "mensaje": "El ID, nombre y email son obligatorios."}
-        
-        actualizado = ClienteModel.actualizar(id_cliente, nombre, email, telefono)
-        if actualizado:
-            return {"exito": True, "mensaje": "Cliente actualizado correctamente."}
-        return {"exito": False, "mensaje": "No se pudo actualizar el cliente (verifique si el ID existe)."}
-
-    @staticmethod
-    def eliminar_cliente(id_cliente):
-        eliminado = ClienteModel.eliminar(id_cliente)
-        if eliminado:
-            return {"exito": True, "mensaje": "Cliente eliminado correctamente."}
-        return {"exito": False, "mensaje": "No se pudo eliminar el cliente."}
+@cliente_bp.route('/eliminar/<int:id_producto>', methods=['POST'])
+def eliminar(id_producto):
+    eliminar_producto(id_producto)
+    return redirect(url_for('producto.index'))

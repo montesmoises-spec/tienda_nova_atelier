@@ -3,18 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tienda NOVA ATELIER{% endblock %}</title>
+    
+    <!-- Tus archivos CSS locales -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
-    <title>Tienda Online - MVC</title>
+    <!-- Iconos de Bootstrap para los botones y menú -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #1e293b;
+            color: #ffffff;
+        }
+        .sidebar .nav-link {
+            color: #94a3b8;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #ffffff;
+            background-color: #334155;
+        }
+        .sidebar .nav-link i {
+            font-size: 1.1rem;
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Gestión de Tienda Online</h1>
-        <hr>
-    </header>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar / Menú Lateral de Navegación -->
+        <aside class="col-md-3 col-lg-2 d-md-block sidebar p-3 collapse">
+            <a href="#" class="d-flex align-items-center mb-4 text-white text-decoration-none px-2">
+                <i class="bi bi-shop fs-4 text-primary me-2"></i>
+                <span class="fs-5 fw-bold">NOVA ATELIER</span>
+            </a>
+            <hr class="border-secondary mb-4">
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="{{ url_for('producto.index') }}" class="nav-link {% if request.endpoint and 'producto' in request.endpoint %}active{% endif %}">
+                        <i class="bi bi-box-seam"></i> Productos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('cliente.index') }}" class="nav-link">
+                        <i class="bi bi-people"></i> Clientes
+                    </a>
+                    
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-cart-check"></i> Pedidos
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+<!-- Tu archivo JS de Bootstrap local -->
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
 </body>
 </html>
