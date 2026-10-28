@@ -1,0 +1,19 @@
+nombre_del_proyecto/
+│
+├── config.py              # Configuración de conexión a la Base de Datos MySQL
+├── app.py                 # Punto de entrada de la aplicación Flask
+├── requirements.txt       # Librerías necesarias (Flask, mysql-connector-python, etc.)
+│
+├── models/                # Capa del MODELO (Responsable: Integrante M)
+│   └── entidad_model.py   # Operaciones SQL y lógica de datos
+│
+├── controllers/           # Capa del CONTROLADOR (Responsable: Integrante C)
+│   └── entidad_controller.py # Rutas de Flask y lógica de control
+│
+└── templates/             # Capa de la VISTA (Responsable: Integrante V)
+│   ├── layout.html        # Estructura base
+│   └── entidad            # carpeta por entidad distinta
+│       └── index.html     # Lista de registros con opción para eliminar               
+│       ├── crear.html     # Formulario de creación
+│       └── editar.html    # Formulario de edición
+├── static/               # Archivos estáticos (CSS, JS, imágenes)

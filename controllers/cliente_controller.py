@@ -12,25 +12,25 @@ def index():
 def crear():
     if request.method == 'POST':
         nombre = request.form['nombre']
-        precio = request.form['precio']
-        stock = request.form['stock']
-        crear_producto(nombre, precio, stock)
-        return redirect(url_for('producto.index'))
-    return render_template('producto/crear.html')
+        email = request.form['email']
+        telefono = request.form['telefono']
+        crear_cliente(nombre, email, telefono)
+        return redirect(url_for('cliente.index'))
+    return render_template('cliente/crear.html')
 
-@cliente_bp.route('/editar/<int:id_producto>', methods=['GET', 'POST'])
-def editar(id_producto):
+@cliente_bp.route('/editar/<int:id_cliente>', methods=['GET', 'POST'])
+def editar(id_cliente):
     if request.method == 'POST':
         nombre = request.form['nombre']
-        precio = request.form['precio']
-        stock = request.form['stock']
-        actualizar_producto(id_producto, nombre, precio, stock)
-        return redirect(url_for('producto.index'))
+        email = request.form['email']
+        telefono = request.form['telefono']
+        actualizar_cliente(id_cliente, nombre, email, telefono)
+        return redirect(url_for('cliente.index'))
     
-    producto = obtener_producto_por_id(id_producto)
-    return render_template('producto/editar.html', producto=producto)
+    cliente = obtener_cliente_por_id(id_cliente)
+    return render_template('cliente/editar.html', cliente=cliente)
 
-@cliente_bp.route('/eliminar/<int:id_producto>', methods=['POST'])
-def eliminar(id_producto):
-    eliminar_producto(id_producto)
-    return redirect(url_for('producto.index'))
+@cliente_bp.route('/eliminar/<int:id_cliente>', methods=['POST'])
+def eliminar(id_cliente):
+    eliminar_cliente(id_cliente)
+    return redirect(url_for('cliente.index'))
